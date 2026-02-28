@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GTRHub Bar Manager</title>
+</head>
+<body>
+  <h1>Bar Manager Prototype</h1>
+
+  <h2>Add Stock Item</h2>
+  <form id="addStockForm">
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="number" id="quantity" placeholder="Quantity" required>
+    <input type="number" id="price" placeholder="Price" required>
+    <input type="text" id="category" placeholder="Category">
+    <button type="submit">Add Item</button>
+  </form>
+
+  <h2>Recipe Search</h2>
+  <input type="text" id="searchQuery" placeholder="Search recipes">
+  <button id="searchBtn">Search</button>
+  <div id="results"></div>
+
+  <script>
+    const API_BASE = 'http://localhost:5000/api'; // Assume backend on 5000
+
+    // Add Stock
+    document.getElementById('addStockForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        name: document.getElementById('name').value,
+        quantity: parseInt(document.getElementById('quantity').value),
+        price: parseFloat(document.getElementById('price').value),
+        category: document.getElementById('category').value
+      };
+      try {
+        const res = await fetch(`${API_BASE}/inventory`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) alert('Item added!');
+      } catch (err) {
+        alert('Error adding item');
+      }
+    });
+
+    // Search Recipes
+    document.getElementById('searchBtn').addEventListener('click', async () => {
+      const query = document.getElementById('searchQuery').value;
+      try {
+        const res = await fetch(`${API_BASE}/recipes/search?query=${query}`);
+        const recipes = await res.json();
+        const resultsDiv = document.getElementById('results');
+        resultsDiv.innerHTML = '';
+        recipes.forEach(recipe => {
+          const p = document.createElement('p');
+          p.textContent = recipe.name;
+          resultsDiv.appendChild(p);
+        });
+      } catch (err) {
+        alert('Error searching');
+      }
+    });
+  </script>
+</body>
+</html>
